@@ -29,96 +29,107 @@
         </div>
         <div class="main-panel">
         <?php include('includes/navbar.php'); ?>
+<?php   
+    require('config/config.php');
+    require('config/db.php');
 
+    //Check if submitted
+    if(isset($_POST['submit'])){
+        //Get form data
+        $name = mysqli_real_escape_string($conn, $_POST['name']);
+        $contactnum = mysqli_real_escape_string($conn, $_POST['contactnum']);
+        $email = mysqli_real_escape_string($conn, $_POST['email']);
+        $address = mysqli_real_escape_string($conn, $_POST['address']);
+        $city = mysqli_real_escape_string($conn, $_POST['city']);
+        $country = mysqli_real_escape_string($conn, $_POST['country']);
+        $postal = mysqli_real_escape_string($conn, $_POST['postal']);
+
+        //Create insert query
+        $query = "INSERT INTO office(name, contactnum, email, address, city, country, postal)
+        VALUES('$name', '$contactnum', '$email', '$address', '$city',' $country', '$postal')";
+        
+        //Execute query
+        if(mysqli_query($conn, $query)){
+            
+        }else{
+            echo 'ERROR: '. mysqli_error($conn);
+        }
+
+    }
+    
+?>   
             <div class="content">
                 <div class="container-fluid">
                     <div class="section">
                     </div>
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-'12'">
                             <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title">Edit Profile</h4>
                                 </div>
                                 <div class="card-body">
-                                    <form>
+                                    <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>" >
                                         <div class="row">
                                             <div class="col-md-5 pr-1">
                                                 <div class="form-group">
-                                                    <label>Company (disabled)</label>
-                                                    <input type="text" class="form-control" disabled="" placeholder="Company" value="Creative Code Inc.">
+                                                    <label>Office Name</label>
+                                                    <input type="text" class="form-control" name="name">
                                                 </div>
                                             </div>
                                             <div class="col-md-3 px-1">
                                                 <div class="form-group">
-                                                    <label>Username</label>
-                                                    <input type="text" class="form-control" placeholder="Username" value="michael23">
+                                                    <label>Contact Number</label>
+                                                    <input type="text" class="form-control" name="contactnum">
                                                 </div>
                                             </div>
                                             <div class="col-md-4 pl-1">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1">Email address</label>
-                                                    <input type="email" class="form-control" placeholder="Email">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 pr-1">
-                                                <div class="form-group">
-                                                    <label>First Name</label>
-                                                    <input type="text" class="form-control" placeholder="Company" value="Mike">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 pl-1">
-                                                <div class="form-group">
-                                                    <label>Last Name</label>
-                                                    <input type="text" class="form-control" placeholder="Last Name" value="Andrew">
+                                                    <input type="email" class="form-control" name="email">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label>Address</label>
-                                                    <input type="text" class="form-control" placeholder="Home Address" value="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09">
+                                                    <label>Address / Building</label>
+                                                    <input type="text" class="form-control" name="address">
                                                 </div>
                                             </div>
+                                            
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-4 pr-1">
+                                        <div class="col-md-4 pr-1">
                                                 <div class="form-group">
                                                     <label>City</label>
-                                                    <input type="text" class="form-control" placeholder="City" value="Mike">
+                                                    <input type="text" class="form-control" name="city">
                                                 </div>
                                             </div>
-                                            <div class="col-md-4 px-1">
+                                            <div class="col-md-4 pr-1">
                                                 <div class="form-group">
                                                     <label>Country</label>
-                                                    <input type="text" class="form-control" placeholder="Country" value="Andrew">
+                                                    <input type="text" class="form-control" name="country">
                                                 </div>
                                             </div>
-                                            <div class="col-md-4 pl-1">
+                                        <!--</div>
+                                        <div class="row">-->
+                                            <div class="col-md-4 pr-1">
                                                 <div class="form-group">
                                                     <label>Postal Code</label>
-                                                    <input type="number" class="form-control" placeholder="ZIP Code">
+                                                    <input type="text" class="form-control" name="postal">
                                                 </div>
                                             </div>
+                                            
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <label>About Me</label>
-                                                    <textarea rows="4" cols="80" class="form-control" placeholder="Here can be your description" value="Mike">Lamborghini Mercy, Your chick she so thirsty, I'm in that two seat Lambo.</textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button type="submit" class="btn btn-info btn-fill pull-right">Update Profile</button>
+                                        
+                                        <button type="submit" name="submit" value="Submit" class="btn btn-info btn-fill pull-right">Save</button>
                                         <div class="clearfix"></div>
                                     </form>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <div class="card card-user">
                                 <div class="card-image">
                                     <img src="https://ununsplash.imgix.net/photo-1431578500526-4d9613015464?fit=crop&fm=jpg&h=300&q=75&w=400" alt="...">
@@ -152,7 +163,7 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
