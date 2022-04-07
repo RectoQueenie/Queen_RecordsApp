@@ -21,10 +21,11 @@ Direction:
 2022-04-06 
 [/] Add assets to the project.  
 [/] Create includes directory; create navbar and sidebar.
-[/] Setup database configuration.  
-[x] Create page for List of office.
-[x] Create page for List of employees.  
-[x] Create page for List of transactions.  
+[/] Setup database configuration.
+2022-04-07  
+[/] Create page for List of office.
+[/] Create page for List of employees.  
+[/] Create page for List of transactions.  
 [x] Create page for adding office.  
 [x] Create page for adding employee.  
 [x] Create page for adding transactions.  
