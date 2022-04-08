@@ -32,7 +32,7 @@ Direction:
 [/] Create page for adding employee.
 [/] Create page for adding transactions.  
 
-2022-04-08  
+2022-04-08 to 2022-04-09  
 [/] Applying pagination to list of office.  
 [/] Applying pagination to list of employees.  
 [/] Applying pagination to list of transactions.  
