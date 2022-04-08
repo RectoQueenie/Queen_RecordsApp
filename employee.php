@@ -23,14 +23,37 @@
     require('config/config.php');
     require('config/db.php');
 
+    // Define the total number of results you want per page
+    $results_per_page = 10;
+
+    // Find the total number of results/rows storedc in the database
+    $query = "SELECT * FROM employee";
+    $result = mysqli_query($conn, $query);
+    $number_of_result = mysqli_num_rows($result);
+   
+    // Determine the total number of pages availble
+    $number_of_page = ceil($number_of_result / $results_per_page);
+   
+    // Determine which page number visitor is currently on
+    if(!isset($_GET['page'])){
+        $page = 1;
+   
+    }else{
+        $page = $_GET['page'];
+    }
+   
+    // Determine the sql LIMIT starting number for the results on the display page
+    $page_first_result = ($page-1) * $results_per_page;
+    
     //Create Query
-    $query = 'SELECT employee.lastname, employee.firstname, employee.address, office.name as office_name FROM employee, office WHERE employee.office_id = office.id ORDER by employee.lastname';
+    $query = 'SELECT employee.id, employee.lastname, employee.firstname, employee.address, office.name as office_name FROM employee, office 
+    WHERE employee.office_id = office.id ORDER by employee.lastname LIMIT '. $page_first_result . ',' . $results_per_page;
 
     //Get the Result
     $result = mysqli_query($conn, $query);
 
     //Fetch the data
-    $offices = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $employees = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
     //Free result
     mysqli_free_result($result);
@@ -41,11 +64,11 @@
 
     <div class="wrapper">
         <div class="sidebar" data-image="../assets/img/sidebar-5.jpg">
-
             <div class="sidebar-wrapper">
                 <?php include('includes/sidebar.php') ?>
-               
-        </div> 
+             </div> 
+        </div>
+        
         <div class="main-panel">
             <?php include('includes/navbar.php') ?>
            
@@ -57,6 +80,12 @@
                     <div class="col-md-12">
                             <div class="card strpied-tabled-with-hover">
                             <br/>
+
+                                <div class="col-md-12">
+                                    <input id="myInput" onkeyup="myFunction()" placeholder="Search here..."
+                                    style="padding: 5px; width: 250px; font-size: 15px;" class="pull-left">
+                                </div>
+
                                 <div class="col-md-12">
                                     <a href="/employee-add.php">
                                         <button type="submit" class= "btn btn-info btn-fill pull-right">Add New Employee</button>
@@ -67,31 +96,46 @@
                                     <p class="card-category">Here is a subtitle for this table</p>
                                 </div>
                                 <div class="card-body table-full-width table-responsive">
-                                    <table class="table table-hover table-striped">
+                                    <table class="table table-hover table-striped" id="myTable">
                                         <thead>
                                             <th>Last name</th>
                                             <th>First name</th>
                                             <th>Address</th>
                                             <th>Office</th>
-
-
+                                            <th>Action</th>
                                         </thead>
-                                        <tbody>
-                                            <?php foreach($offices as $office) : ?>
-                                            <tr>
-                                                <td><?php echo $office['lastname']; ?></td>
-                                                <td><?php echo $office['firstname']; ?></td>
-                                                <td><?php echo $office['address']; ?></td>
-                                                <td><?php echo $office['office_name']; ?></td>
 
+                                        <tbody>
+                                            
+                                            <?php foreach($employees as $employee) : ?>
+
+                                            <tr>
+                                                <td> <?php echo $employee['lastname']; ?> </td>
+                                                <td> <?php echo $employee['firstname']; ?> </td>
+                                                <td> <?php echo $employee['address']; ?> </td>
+                                                <td> <?php echo $employee['office_name']; ?> </td>   
+                                                <td> 
+                                                    <a href="/employee-edit.php?id=<?php echo $employee['id']; ?>"> 
+                                                        <button type="submit" class="btn btn-warning btn-fill pull-right">Edit</button>
+                                                    </a>
+                                                </td>                           
                                             </tr>
+                                            
                                             <?php endforeach ?>
+                                            
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
-                        </div>
+                    </div>
+
+                    <?php
+                        for($page = 1; $page <= $number_of_page; $page++){
+                            echo '<a href="employee.php?page='. $page . '">' . $page . '</a>';
+                        }
+                    ?>
+                    
                 </div>
             </div>
             <footer class="footer">
@@ -133,6 +177,36 @@
     </div>
 
 </body>
+
+<script>
+    function myFunction() 
+    {
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("myInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("myTable");
+      tr = table.getElementsByTagName("tr");
+      th = table.getElementsByTagName("th");
+      
+      for (i = 1; i < tr.length; i++) 
+      {
+        tr[i].style.display = "none";    
+        for(var j = 0; j < th.length; j++)
+        {
+          td = tr[i].getElementsByTagName("td")[j];      
+          if (td) 
+          {
+            if (td.innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1)                               
+            {
+                tr[i].style.display = "";
+                break;
+            }
+          }
+        }
+      }
+    }
+  </script>
+
 <!--   Core JS Files   -->
 <script src="assets/js/core/jquery.3.2.1.min.js" type="text/javascript"></script>
 <script src="assets/js/core/popper.min.js" type="text/javascript"></script>

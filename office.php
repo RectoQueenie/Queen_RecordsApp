@@ -23,29 +23,52 @@
     require('config/config.php');
     require('config/db.php');
 
+       // Define the total number of results you want per page
+       $results_per_page = 10;
 
-    //Create Query
-    $query = 'SELECT * FROM office ORDER BY name';
+       // Find the total number of results/rows storedc in the database
+       $query = "SELECT * FROM office";
+       $result = mysqli_query($conn, $query);
+        $number_of_result = mysqli_num_rows($result);
 
-    //Get the Result
-    $result = mysqli_query($conn, $query);
+       // Determine the total number of pages availble
+       $number_of_page = ceil($number_of_result / $results_per_page);
 
-    //Fetch the data
-    $offices = mysqli_fetch_all($result, MYSQLI_ASSOC);
+       // Determine which page number visitor is currently on
+       if(!isset($_GET['page'])){
+           $page = 1;
 
-    //Free result
-    mysqli_free_result($result);
+       }else{
+           $page = $_GET['page'];
+       }
 
-    //Close the connection
-    mysqli_close($conn);
-?>
+       // Determine the sql LIMIT starting number for the results on the display page
+       $page_first_result = ($page-1) * $results_per_page;
+
+       // Create Query
+       $query = 'SELECT * FROM office ORDER BY name LIMIT '. $page_first_result . ',' . $results_per_page;
+
+       // Get the result
+       $result = mysqli_query($conn, $query);
+
+       // Fetch the data
+       $offices = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+       // Free result
+       mysqli_free_result($result);
+
+       // Close the connection
+       mysqli_close($conn);
+
+   ?>
+
     <div class="wrapper">
         <div class="sidebar" data-image="../assets/img/sidebar-5.jpg">
-
             <div class="sidebar-wrapper">
                 <?php include('includes/sidebar.php') ?>
-   
+             </div> 
         </div> 
+
         <div class="main-panel">
             <?php include('includes/navbar.php') ?>
            
@@ -57,6 +80,12 @@
                     <div class="col-md-12">
                             <div class="card strpied-tabled-with-hover">
                                 <br/>
+
+                                <div class="col-md-12">
+                                    <input id="myInput" onkeyup="myFunction()" placeholder="Search here..."
+                                    style="padding: 5px; width: 250px; font-size: 15px;" class="pull-left">
+                                </div>
+
                                 <div class="col-md-12">
                                     <a href="/office-add.php">
                                         <button type="submit" class= "btn btn-info btn-fill pull-right">Add New Office</button>
@@ -64,11 +93,11 @@
                                 </div>
 
                                 <div class="card-header ">
-                                    <h4 class="card-title">Striped Table with Hover</h4>
+                                    <h4 class="card-title">Offices</h4>
                                     <p class="card-category">Here is a subtitle for this table</p>
                                 </div>
                                 <div class="card-body table-full-width table-responsive">
-                                    <table class="table table-hover table-striped">
+                                    <table class="table table-hover table-striped" id="myTable">
                                         <thead>
                                             <th>Name</th>
                                             <th>Contact Number</th>
@@ -77,6 +106,7 @@
                                             <th>City</th>
                                             <th>Country</th>
                                             <th>Postal</th>
+                                            <th>Action</th>
 
                                         </thead>
                                         <tbody>
@@ -89,6 +119,11 @@
                                                 <td><?php echo $office['city']; ?></td>
                                                 <td><?php echo $office['country']; ?></td>
                                                 <td><?php echo $office['postal']; ?></td>
+                                                <td>
+                                                    <a href="/office-edit.php?id=<?php echo $office['id']; ?>">
+                                                        <button type="submit" class="btn btn-warning btn-fill pull-right">Edit</button>
+                                                    </a>
+                                                </td>
                                             </tr>
                                             <?php endforeach ?>
                                         </tbody>
@@ -96,7 +131,14 @@
                                 </div>
                             </div>
                         </div>
-                        </div>
+                    </div>
+                    
+                    <?php
+                        for($page = 1; $page <= $number_of_page; $page++){
+                            echo '<a href="office.php?page='. $page . '">' . $page . '</a>';
+                        }
+                    ?>
+
                 </div>
             </div>
             <footer class="footer">
@@ -136,86 +178,38 @@
             </footer>
         </div>
     </div>
-    <!--   -->
-    <!-- <div class="fixed-plugin">
-    <div class="dropdown show-dropdown">
-        <a href="#" data-toggle="dropdown">
-            <i class="fa fa-cog fa-2x"> </i>
-        </a>
 
-        <ul class="dropdown-menu">
-			<li class="header-title"> Sidebar Style</li>
-            <li class="adjustments-line">
-                <a href="javascript:void(0)" class="switch-trigger">
-                    <p>Background Image</p>
-                    <label class="switch">
-                        <input type="checkbox" data-toggle="switch" checked="" data-on-color="primary" data-off-color="primary"><span class="toggle"></span>
-                    </label>
-                    <div class="clearfix"></div>
-                </a>
-            </li>
-            <li class="adjustments-line">
-                <a href="javascript:void(0)" class="switch-trigger background-color">
-                    <p>Filters</p>
-                    <div class="pull-right">
-                        <span class="badge filter badge-black" data-color="black"></span>
-                        <span class="badge filter badge-azure" data-color="azure"></span>
-                        <span class="badge filter badge-green" data-color="green"></span>
-                        <span class="badge filter badge-orange" data-color="orange"></span>
-                        <span class="badge filter badge-red" data-color="red"></span>
-                        <span class="badge filter badge-purple active" data-color="purple"></span>
-                    </div>
-                    <div class="clearfix"></div>
-                </a>
-            </li>
-            <li class="header-title">Sidebar Images</li>
-
-            <li class="active">
-                <a class="img-holder switch-trigger" href="javascript:void(0)">
-                    <img src="../assets/img/sidebar-1.jpg" alt="" />
-                </a>
-            </li>
-            <li>
-                <a class="img-holder switch-trigger" href="javascript:void(0)">
-                    <img src="../assets/img/sidebar-3.jpg" alt="" />
-                </a>
-            </li>
-            <li>
-                <a class="img-holder switch-trigger" href="javascript:void(0)">
-                    <img src="..//assets/img/sidebar-4.jpg" alt="" />
-                </a>
-            </li>
-            <li>
-                <a class="img-holder switch-trigger" href="javascript:void(0)">
-                    <img src="../assets/img/sidebar-5.jpg" alt="" />
-                </a>
-            </li>
-
-            <li class="button-container">
-                <div class="">
-                    <a href="http://www.creative-tim.com/product/light-bootstrap-dashboard" target="_blank" class="btn btn-info btn-block btn-fill">Download, it's free!</a>
-                </div>
-            </li>
-
-            <li class="header-title pro-title text-center">Want more components?</li>
-
-            <li class="button-container">
-                <div class="">
-                    <a href="http://www.creative-tim.com/product/light-bootstrap-dashboard-pro" target="_blank" class="btn btn-warning btn-block btn-fill">Get The PRO Version!</a>
-                </div>
-            </li>
-
-            <li class="header-title" id="sharrreTitle">Thank you for sharing!</li>
-
-            <li class="button-container">
-				<button id="twitter" class="btn btn-social btn-outline btn-twitter btn-round sharrre"><i class="fa fa-twitter"></i> · 256</button>
-                <button id="facebook" class="btn btn-social btn-outline btn-facebook btn-round sharrre"><i class="fa fa-facebook-square"></i> · 426</button>
-            </li>
-        </ul>
-    </div>
-</div>
- -->
 </body>
+
+<script>
+    function myFunction() 
+    {
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("myInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("myTable");
+      tr = table.getElementsByTagName("tr");
+      th = table.getElementsByTagName("th");
+      
+      for (i = 1; i < tr.length; i++) 
+      {
+        tr[i].style.display = "none";    
+        for(var j = 0; j < th.length; j++)
+        {
+          td = tr[i].getElementsByTagName("td")[j];      
+          if (td) 
+          {
+            if (td.innerHTML.toUpperCase().indexOf(filter.toUpperCase()) > -1)                               
+            {
+                tr[i].style.display = "";
+                break;
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
 <!--   Core JS Files   -->
 <script src="assets/js/core/jquery.3.2.1.min.js" type="text/javascript"></script>
 <script src="assets/js/core/popper.min.js" type="text/javascript"></script>
